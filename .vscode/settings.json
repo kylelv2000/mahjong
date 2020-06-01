@@ -1,0 +1,22 @@
+{
+    "files.associations": {
+        "algorithm": "cpp",
+        "iosfwd": "cpp",
+        "vector": "cpp",
+        "utility": "cpp",
+        "stdexcept": "cpp",
+        "string": "cpp",
+        "__split_buffer": "cpp",
+        "deque": "cpp",
+        "sstream": "cpp",
+        "complex": "cpp",
+        "__hash_table": "cpp",
+        "__tree": "cpp",
+        "atomic": "cpp",
+        "ios": "cpp",
+        "map": "cpp",
+        "system_error": "cpp",
+        "unordered_map": "cpp",
+        "ostream": "cpp"
+    }
+}
