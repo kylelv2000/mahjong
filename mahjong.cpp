@@ -792,7 +792,9 @@ void play(int playerID,char *tmpCard){
     responseOther(tmpCard);
 }
 int tpu[6][11];
+bool iseasy = 0, researched = 0;
 void easyplay(char *tmpCard){
+    iseasy = 1;
     for(int i=0;i<5;++i)for(int j=1;j<=9;++j){
         if((i==3&&j>4)||(i==4&&j>3)) break;
         if(tmpMyCard.shouPai[i][j]>1) tpu[i][j]+=2;
@@ -1078,7 +1080,7 @@ void saveData(){
 huFa tqaq[50010];
 int tpHuCnt;
 //距胡法差的张数
-int getlhc(int p){
+int getlhc(int p, int f=0){
     CARD ret;ret.copy(Card[myID]);
     ret.getShouPai();
     int tt=0,tans=0;
@@ -1096,10 +1098,10 @@ int getlhc(int p){
         if(ty) for(int j=-1;j<=1;++j) ret.shouPai[tx][ty]--;
         if(ty) ++tt;
         tx=plan[p].outKe[i]/10;ty=plan[p].outKe[i]%10;
-        if(ty) if(!ret.mingKe[tx][ty])tans+=100;
+        if(ty) if(!ret.mingKe[tx][ty]){if(f){ret.shouPai[tx][ty]-=3;}else{tans+=100;}}
         if(ty) ++tt;
         tx=plan[p].outShun[i]/10;ty=plan[p].outShun[i]%10;
-        if(ty) {if(!ret.shun[tx][ty])tans+=100;ret.shun[tx][ty]--;}
+        if(ty) {if(!ret.shun[tx][ty]){if(f){for(int j=-1;j<=1;++j) ret.shouPai[tx][ty+j]--;}else{tans+=100;}};ret.shun[tx][ty]--;}
         if(ty) ++tt;
         tx=plan[p].outGang[i]/10;ty=plan[p].outGang[i]%10;
         if(ty) {if(!ret.mingGang[tx][ty])tans+=100;}
@@ -1310,6 +1312,8 @@ int main()
 #if SIMPLEIO
     cout << response[turnID] << endl;
     //log
+    if(iseasy)cout << "easyplay" << " ";
+    if(!researched)cout << "not searched" <<" ";
     cout<<huCnt<<" "<<Card[myID].leastHuCard<<" ";
     cout<<"HD:"<<card_cnt[0]<<','<<card_cnt[1]<<','<<card_cnt[2]<<','<<card_cnt[3]<<' ';
     if(searchover) PUT("over");
@@ -1360,18 +1364,19 @@ void searchUpdate(){
     if(!searchover||!rebuild) return;
     int x=6;
     Card[myID].getShouPai();
-    for(int i=1;i<=huCnt;i++)x=min(x,getlhc(i)+1);
+    for(int i=1;i<=huCnt;i++)x=min(x,getlhc(i,1)+1);
     int cntdui=0;
     for(int i=0;i<5;i++)for(int j=1;j<=9;j++)cntdui+=Card[myID].shouPai[i][j]/2;
     if(Card[myID].countOutCard) cntdui=0;
-    if(min(x,7-cntdui)>3) return;
 
+    if(min(x,7-cntdui)>3) return;
     Card[myID].leastHuCard=min(x,7-cntdui);
     for(int i=1;i<=4000;i++)plan[i].init();
     huCnt=tmphucnt=0;
     tmpMyCard.copy(Card[myID]);
     tmpMyCard.getShouPai();
     searchover=0;rebuild=0;
+    researched = 1;
     search();
     if(!searchover){qaz_err+="ERROR!!!!!";}
     else rebuildHuFa();
