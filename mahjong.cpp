@@ -755,6 +755,7 @@ void search(){
     }
     if(turnID==1){
         tmpMyCard.leastHuCard=6;//不然的话继承上次的
+        if(tmpMyCard.leastHuCard<4) tmpMyCard.leastHuCard++;
         //judgeSpecial();//判断七小对十三幺等牌型
     }
     diffCardlimit=6;//最多允许有6张牌不一样
@@ -1246,6 +1247,7 @@ void rebuildHuFa(){
     for(int p=1;p<=huCnt;++p){
         if(lhc<LHC[p]) continue;
         rebuildHuFa(p);
+        if(tpHuCnt>4000) break;
     }
     huCnt=tpHuCnt;
     huCnt=min(huCnt,4000);
@@ -1286,23 +1288,23 @@ int main()
         search();
     }
     if(searchover&&!rebuild) rebuildHuFa();
-    else if(turnID>0&&turnID%5==0){
-        int x=6;
-        Card[myID].getShouPai();
-        for(int i=1;i<=huCnt;i++)x=min(x,getlhc(i));
-        for(int i=1;i<=4000;i++)plan[i].init();
-        int cntdui=0;
-        for(int i=0;i<5;i++)for(int j=1;j<=9;j++)cntdui+=Card[myID].shouPai[i][j]/2;
-        if(Card[myID].countOutCard!=0)cntdui=0;
-        huCnt=tmphucnt=0;
-        Card[myID].leastHuCard=min(min(x+1,5),7-cntdui);
-        tmpMyCard.copy(Card[myID]);
-        tmpMyCard.getShouPai();
-        searchover=0;rebuild=0;
-        search();
-        if(!searchover){qaz_err+="ERROR!!!!!";}
-        else rebuildHuFa();
-    }
+    // else if(turnID>0&&turnID%5==0){
+    //     int x=6;
+    //     Card[myID].getShouPai();
+    //     for(int i=1;i<=huCnt;i++)x=min(x,getlhc(i));
+    //     for(int i=1;i<=4000;i++)plan[i].init();
+    //     int cntdui=0;
+    //     for(int i=0;i<5;i++)for(int j=1;j<=9;j++)cntdui+=Card[myID].shouPai[i][j]/2;
+    //     if(Card[myID].countOutCard!=0)cntdui=0;
+    //     huCnt=tmphucnt=0;
+    //     Card[myID].leastHuCard=min(min(x+1,5),7-cntdui);
+    //     tmpMyCard.copy(Card[myID]);
+    //     tmpMyCard.getShouPai();
+    //     searchover=0;rebuild=0;
+    //     search();
+    //     if(!searchover){qaz_err+="ERROR!!!!!";}
+    //     else rebuildHuFa();
+    // }
     work();
 
 #if SIMPLEIO
@@ -1358,11 +1360,11 @@ void searchUpdate(){
     if(!searchover||!rebuild) return;
     int x=6;
     Card[myID].getShouPai();
-    for(int i=1;i<=huCnt;i++)x=min(x,getlhc(i))+1;
+    for(int i=1;i<=huCnt;i++)x=min(x,getlhc(i)+1);
     int cntdui=0;
     for(int i=0;i<5;i++)for(int j=1;j<=9;j++)cntdui+=Card[myID].shouPai[i][j]/2;
     if(Card[myID].countOutCard) cntdui=0;
-    if(min(x,7-cntdui)>2) return;
+    if(min(x,7-cntdui)>3) return;
 
     Card[myID].leastHuCard=min(x,7-cntdui);
     for(int i=1;i<=4000;i++)plan[i].init();
