@@ -1336,7 +1336,7 @@ int main()
         if(Card[myID].shouPai[i][j]>0)cout<<intToString(i,j)<<" "<<useful[i][j]<<" ";
     }
     for(int i=1;i<=min(5,huCnt);i++){
-        if(getlhc(i)>Card[myID].leastHuCard){cout<<"wrong hufa!!!"<<" ";continue;}
+        if(getlhc(i,rebuild)>Card[myID].leastHuCard){cout<<"wrong hufa!!!"<<" ";continue;}
         for(int j=0,tx,ty;j<4;j++){
         tx=plan[i].shun[j]/10;ty=plan[i].shun[j]%10;
         if(ty) cout<<"shun"<<tx<<ty<<" ";
