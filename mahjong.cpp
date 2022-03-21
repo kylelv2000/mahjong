@@ -482,22 +482,22 @@ bool check7Dui(int lim){
 bool judgeGang(){//直接从自己手牌判断杠，其他不管了，标准useful<=1，有暗杠就杠 qaq
     if(!rebuild) return false;
     if(haiDi()) return false;
-    for(int i=0;i<5;++i)for(int j=1;j<10;++j){
-        if(tmpMyCard.shouPai[i][j]==4){
-            //是否是七对
-            if(check7Dui(3)) continue;
-            //qwq
-            char tttmp[4];strcpy(tttmp,intToString(i,j).c_str());
-            Card[myID].anGang[i][j]++;Card[myID].countOutCard++;
-            response.push_back("GANG "+intToString(i,j));
-            return true;
-        }
-        if(tmpMyCard.shouPai[i][j]>0&&Card[myID].mingKe[i][j]&&isuseless(i,j)){
-            char tttmp[4];strcpy(tttmp,intToString(i,j).c_str());
-            response.push_back("BUGANG "+intToString(i,j));
-            return true;
-        }
-    }
+    // for(int i=0;i<5;++i)for(int j=1;j<10;++j){
+    //     // if(tmpMyCard.shouPai[i][j]==4){
+    //     //     //是否是七对
+    //     //     if(check7Dui(3)) continue;
+    //     //     //qwq
+    //     //     char tttmp[4];strcpy(tttmp,intToString(i,j).c_str());
+    //     //     Card[myID].anGang[i][j]++;Card[myID].countOutCard++;
+    //     //     response.push_back("GANG "+intToString(i,j));
+    //     //     return true;
+    //     // }
+    //     if(tmpMyCard.shouPai[i][j]>0&&Card[myID].mingKe[i][j]&&isuseless(i,j)){
+    //         char tttmp[4];strcpy(tttmp,intToString(i,j).c_str());
+    //         response.push_back("BUGANG "+intToString(i,j));
+    //         return true;
+    //     }
+    // }
     return false;
 }
 bool judgeHu(const char *tmpCard,bool isGang=0){
@@ -1290,23 +1290,23 @@ int main()
         search();
     }
     if(searchover&&!rebuild) rebuildHuFa();
-    // else if(turnID>0&&turnID%5==0){
-    //     int x=6;
-    //     Card[myID].getShouPai();
-    //     for(int i=1;i<=huCnt;i++)x=min(x,getlhc(i));
-    //     for(int i=1;i<=4000;i++)plan[i].init();
-    //     int cntdui=0;
-    //     for(int i=0;i<5;i++)for(int j=1;j<=9;j++)cntdui+=Card[myID].shouPai[i][j]/2;
-    //     if(Card[myID].countOutCard!=0)cntdui=0;
-    //     huCnt=tmphucnt=0;
-    //     Card[myID].leastHuCard=min(min(x+1,5),7-cntdui);
-    //     tmpMyCard.copy(Card[myID]);
-    //     tmpMyCard.getShouPai();
-    //     searchover=0;rebuild=0;
-    //     search();
-    //     if(!searchover){qaz_err+="ERROR!!!!!";}
-    //     else rebuildHuFa();
-    // }
+    else if(turnID>0&&turnID%5==0){
+        int x=6;
+        Card[myID].getShouPai();
+        for(int i=1;i<=huCnt;i++)x=min(x,getlhc(i));
+        for(int i=1;i<=4000;i++)plan[i].init();
+        int cntdui=0;
+        for(int i=0;i<5;i++)for(int j=1;j<=9;j++)cntdui+=Card[myID].shouPai[i][j]/2;
+        if(Card[myID].countOutCard!=0)cntdui=0;
+        huCnt=tmphucnt=0;
+        Card[myID].leastHuCard=min(min(x+1,5),7-cntdui);
+        tmpMyCard.copy(Card[myID]);
+        tmpMyCard.getShouPai();
+        searchover=0;rebuild=0;
+        search();
+        if(!searchover){qaz_err+="ERROR!!!!!";}
+        else rebuildHuFa();
+    }
     work();
 
 #if SIMPLEIO
@@ -1369,7 +1369,7 @@ void searchUpdate(){
     for(int i=0;i<5;i++)for(int j=1;j<=9;j++)cntdui+=Card[myID].shouPai[i][j]/2;
     if(Card[myID].countOutCard) cntdui=0;
 
-    if(min(x,7-cntdui)>3) return;
+    if(min(x,7-cntdui)>4) return;
     Card[myID].leastHuCard=min(x,7-cntdui);
     for(int i=1;i<=4000;i++)plan[i].init();
     huCnt=tmphucnt=0;
