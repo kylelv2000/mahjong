@@ -647,6 +647,7 @@ void search_best(int dist){
         ++searchtime;
         if(judgeHu14()){
             //plan[++huCnt]=TMP;
+            if(tmpMyCard.leastHuCard>dist)huCnt=0;
             if(huCnt==4000){
             tmphucnt=(tmphucnt%4000)+1;
             plan[tmphucnt].init();
@@ -1232,11 +1233,17 @@ void rebuildHuFa(int p){
             int ii=0,jj=0;
             for(int i=0;i<5;++i) for(int j=1;j<=9;++j){
                 if(tmpMyCard.shouPai[i][j]&&!ii&&!jj) ii=i,jj=j;
-                if(tmpMyCard.shouPai[i][j]>Card[myID].shouPai[i][j]) ii=i,jj=j;
+                if(tmpMyCard.shouPai[i][j]>Card[myID].shouPai[i][j]){
+                    ii=i,jj=j;
+                    tmpMyCard.shouPai[ii][jj]--;
+                    char tttmp[4];strcpy(tttmp,intToString(ii,jj).c_str());
+                    if(judgeHu(tttmp)){tqaq[++tpHuCnt]=ret;break;} 
+                    tmpMyCard.shouPai[ii][jj]++;
+                } 
             }
-            tmpMyCard.shouPai[ii][jj]--;
-            char tttmp[4];strcpy(tttmp,intToString(ii,jj).c_str());
-            if(judgeHu(tttmp)) tqaq[++tpHuCnt]=ret;
+            // tmpMyCard.shouPai[ii][jj]--;
+            // char tttmp[4];strcpy(tttmp,intToString(ii,jj).c_str());
+            // if(judgeHu(tttmp)) tqaq[++tpHuCnt]=ret;
         }
     }
 }
@@ -1306,11 +1313,13 @@ int main()
         tmpMyCard.copy(Card[myID]);
         tmpMyCard.getShouPai();
         searchover=0;rebuild=0;
+        researched = 1;
         search();
         if(!searchover){qaz_err+="ERROR!!!!!";}
         else rebuildHuFa();
     }
     work();
+    // if(searchover&!rebuild)rebuildHuFa();
 
 #if SIMPLEIO
     cout << response[turnID] << endl;
@@ -1327,6 +1336,7 @@ int main()
         if(Card[myID].shouPai[i][j]>0)cout<<intToString(i,j)<<" "<<useful[i][j]<<" ";
     }
     for(int i=1;i<=min(5,huCnt);i++){
+        if(getlhc(i)>Card[myID].leastHuCard){cout<<"wrong hufa!!!"<<" ";continue;}
         for(int j=0,tx,ty;j<4;j++){
         tx=plan[i].shun[j]/10;ty=plan[i].shun[j]%10;
         if(ty) cout<<"shun"<<tx<<ty<<" ";
