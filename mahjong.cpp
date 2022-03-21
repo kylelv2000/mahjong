@@ -1101,7 +1101,7 @@ int getlhc(int p, int f=0){
         if(ty) if(!ret.mingKe[tx][ty]){if(f){ret.shouPai[tx][ty]-=3;}else{tans+=100;}}
         if(ty) ++tt;
         tx=plan[p].outShun[i]/10;ty=plan[p].outShun[i]%10;
-        if(ty) {if(!ret.shun[tx][ty]){if(f){for(int j=-1;j<=1;++j) ret.shouPai[tx][ty+j]--;}else{tans+=100;}};ret.shun[tx][ty]--;}
+        if(ty) {if(ret.shun[tx][ty]<=0){if(f){for(int j=-1;j<=1;++j) ret.shouPai[tx][ty+j]--;}else{tans+=100;}};ret.shun[tx][ty]--;}
         if(ty) ++tt;
         tx=plan[p].outGang[i]/10;ty=plan[p].outGang[i]%10;
         if(ty) {if(!ret.mingGang[tx][ty])tans+=100;}
