@@ -647,7 +647,7 @@ void search_best(int dist){
         ++searchtime;
         if(judgeHu14()){
             //plan[++huCnt]=TMP;
-            if(tmpMyCard.leastHuCard>dist)huCnt=0;
+            // if(tmpMyCard.leastHuCard>dist)huCnt=0;
             if(huCnt==4000){
             tmphucnt=(tmphucnt%4000)+1;
             plan[tmphucnt].init();
@@ -1256,7 +1256,7 @@ void rebuildHuFa(){
         if(LHC[p]!=0) lhc=min(lhc,LHC[p]);
     }
     for(int p=1;p<=huCnt;++p){
-        if(lhc<LHC[p]) continue;
+        if(lhc<LHC[p]-1) continue;
         rebuildHuFa(p);
         if(tpHuCnt>4000) break;
     }
