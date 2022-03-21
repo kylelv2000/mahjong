@@ -845,6 +845,7 @@ void play(char *tmpCard){
         tmpMyCard.getShouPai();
         
         searchover=0;rebuild=0;
+        researched = 1;
         search();
         //直接在judgeGang里写response了
         return;
@@ -918,6 +919,7 @@ void work(){
         }
         tmpMyCard.copy(Card[myID]);
         tmpMyCard.getShouPai();
+        researched = 1;
         search();
         //花牌好像也没什么用，具体信息没读qaq
         response.push_back("PASS");
@@ -1287,6 +1289,7 @@ int main()
     if(!searchover&&turnID>1){
         tmpMyCard.copy(Card[myID]);
         tmpMyCard.getShouPai();
+        researched = 1;
         search();
     }
     if(searchover&&!rebuild) rebuildHuFa();
@@ -1369,7 +1372,7 @@ void searchUpdate(){
     for(int i=0;i<5;i++)for(int j=1;j<=9;j++)cntdui+=Card[myID].shouPai[i][j]/2;
     if(Card[myID].countOutCard) cntdui=0;
 
-    if(min(x,7-cntdui)>3) return;
+    if(min(x,7-cntdui)>4) return;
     Card[myID].leastHuCard=min(x,7-cntdui);
     for(int i=1;i<=4000;i++)plan[i].init();
     huCnt=tmphucnt=0;
