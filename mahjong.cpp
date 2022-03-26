@@ -637,7 +637,7 @@ void search_best(int dist){
         int dif=2-(tmpMyCard.shouPai[i][j]-tmp[i][j]);
         dif=min(max(dif,0),2);
         dist+=dif;
-        if(dist>tmpMyCard.leastHuCard){dist-=dif;continue;}
+        if(dist>max(tmpMyCard.leastHuCard,3)){dist-=dif;continue;}
         search_list[++search_deep][0]=i,search_list[search_deep][1]=j;
         if(dif>0){for(int k=0;k<4;k++)if(!TMP.duizi[k]){TMP.duizi[k]=i*10+j;TMP.tt++;break;}}
         else {for(int k=0;k<4;k++)if(!TMP.myduizi[k]){TMP.myduizi[k]=i*10+j;TMP.tt++;break;}}
@@ -674,7 +674,7 @@ void search_dfs_shun(int dep,int limit,int I,int J){
         return ;
     }
     if(searchtime>=searchtimelimit) return;
-    if(diffCardlimit-limit>tmpMyCard.leastHuCard)return ;
+    if(diffCardlimit-limit>max(tmpMyCard.leastHuCard,3))return ;
     for(int i=I;i<3;++i,J=2)for(int j=J;j<=8;++j){//枚举顺子
         if(i<search_list[search_deep+1][0]||(i==search_list[search_deep+1][0]&&j<search_list[search_deep+1][1]))continue;
         if(outCard.c[i][j]+tmp[i][j]>3) continue;
@@ -708,7 +708,7 @@ void search_dfs_ke(int dep,int limit,int I,int J){
         return ;
     }
     if(searchtime>=searchtimelimit) return;
-    if(diffCardlimit-limit>tmpMyCard.leastHuCard)return ;
+    if(diffCardlimit-limit>max(tmpMyCard.leastHuCard,3))return ;
 
     for(int i=I;i<5;++i,J=1)for(int j=J;j<10;++j){//枚举刻子
         if(i<search_list[search_deep+1][0]||(i==search_list[search_deep+1][0]&&j<search_list[search_deep+1][1]))continue;
@@ -1335,8 +1335,11 @@ int main()
     for(int i=0;i<5;i++)for(int j=1;j<=9;j++){
         if(Card[myID].shouPai[i][j]>0)cout<<intToString(i,j)<<" "<<useful[i][j]<<" ";
     }
-    for(int i=1;i<=min(5,huCnt);i++){
-        if(getlhc(i,rebuild)>Card[myID].leastHuCard){cout<<"wrong hufa!!!"<<" ";continue;}
+    int ccnt = 0;
+    for(int i=1;i<=huCnt;i++){
+        if(getlhc(i,rebuild)>Card[myID].leastHuCard){/*cout<<"wrong hufa!!!"<<" ";*/continue;}
+        ccnt += 1;
+        if(ccnt > 5)break;
         for(int j=0,tx,ty;j<4;j++){
         tx=plan[i].shun[j]/10;ty=plan[i].shun[j]%10;
         if(ty) cout<<"shun"<<tx<<ty<<" ";
