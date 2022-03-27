@@ -387,7 +387,7 @@ bool judgeSpecial(char *tmpCard){
     memset(useful,0,sizeof(useful));
     int dist=0,pair_cnt=0;
     for(int i=0;i<3;++i){
-        sptmp[i][1]=sptmp[i][9]=sptmp[4][i]=2;
+        sptmp[i][1]=sptmp[i][9]=sptmp[4][i+1]=2;
         if(!tmpMyCard.shouPai[i][1]){
             dist++;
             if(!remCard[i][1]) dist=100;
@@ -396,15 +396,15 @@ bool judgeSpecial(char *tmpCard){
             dist++;
             if(!remCard[i][9]) dist=100;
         }else useful[i][9]=10;
-        if(!tmpMyCard.shouPai[4][i]){
+        if(!tmpMyCard.shouPai[4][i+1]){
             dist++;
-            if(!remCard[4][i]) dist=100;
-        }else useful[4][i]=10;
+            if(!remCard[4][i+1]) dist=100;
+        }else useful[4][i+1]=10;
         if(tmpMyCard.shouPai[i][1]==2) pair_cnt=1,useful[i][1]=4+remCard[i][1];
         if(tmpMyCard.shouPai[i][9]==2) pair_cnt=1,useful[i][9]=4+remCard[i][9];
-        if(tmpMyCard.shouPai[4][i]==2) pair_cnt=1,useful[4][i]=4+remCard[4][i];
+        if(tmpMyCard.shouPai[4][i+1]==2) pair_cnt=1,useful[4][i+1]=4+remCard[4][i+1];
     }
-    for(int i=0;i<4;++i){
+    for(int i=1;i<=4;++i){
         sptmp[3][i]=2;
         if(!tmpMyCard.shouPai[3][i]){
             dist++;
@@ -421,19 +421,19 @@ bool judgeSpecial(char *tmpCard){
     //全不靠
     dist=14;
     memset(useful,0,sizeof(useful));
-    for(int i=0;i<4;++i){//东南西北
+    for(int i=1;i<=4;++i){//东南西北
         if(tmpMyCard.shouPai[3][i]){
             dist--;
             if(tmpMyCard.shouPai[3][i]==1) useful[3][i]=10;
-        }else if(!remCard[3][i]) dist=100;
+        }
     }
-    for(int i=0;i<3;++i){//中发白
+    for(int i=1;i<=3;++i){//中发白
         if(tmpMyCard.shouPai[4][i]){
             dist--;
             if(tmpMyCard.shouPai[4][i]==1) useful[4][i]=10;
-        }else if(!remCard[4][i]) dist=100;
+        }
     }
-    tdis=dist;//goto 不让在这声明w
+    tdis=dist;//goto 不让在这定义变量w
     while(next_permutation(arr,arr+3)){//枚举组合方式
         int ttdis=dist;
         for(int i=0;i<3;++i){
@@ -1419,6 +1419,7 @@ int main()
     cout << response[turnID] << endl;
     //log
     if(iseasy)cout << "easyplay" << " ";
+    if(specialplay)cout << "specialplay" << " ";
     if(!researched)cout << "not searched" <<" ";
     cout<<huCnt<<" "<<Card[myID].leastHuCard<<" ";
     cout<<"HD:"<<card_cnt[0]<<','<<card_cnt[1]<<','<<card_cnt[2]<<','<<card_cnt[3]<<' ';
