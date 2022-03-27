@@ -1318,6 +1318,7 @@ void rebuildHuFa(int p){
             ttt|=judgeHu(tttmp);
             isMyTurn=tmt;
             if(ttt) tqaq[++tpHuCnt]=ret;
+            tmpMyCard.shouPai[ii][jj]++;
         }else{
             int ii=0,jj=0;
             for(int i=0;i<5;++i) for(int j=1;j<=9;++j){
@@ -1326,7 +1327,11 @@ void rebuildHuFa(int p){
                     ii=i,jj=j;
                     tmpMyCard.shouPai[ii][jj]--;
                     char tttmp[4];strcpy(tttmp,intToString(ii,jj).c_str());
-                    if(judgeHu(tttmp)){tqaq[++tpHuCnt]=ret;break;} 
+                    if(judgeHu(tttmp)){
+                        tqaq[++tpHuCnt]=ret;
+                        tmpMyCard.shouPai[ii][jj]++;
+                        break;
+                    } 
                     tmpMyCard.shouPai[ii][jj]++;
                 } 
             }
