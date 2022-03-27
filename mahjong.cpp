@@ -362,48 +362,130 @@ bool isJueZhang(const char *tmpCard){
     int tp=getType(tmpCard);
     return isMyTurn?(outCard.c[tp][tmpCard[1]-'0']==3):outCard.c[tp][tmpCard[1]-'0']==4;
 }
-/*
-void judgeSpecial(){
-    if(tmpMyCard.countOutCard>0)return ;
-    //七对
-    memset(tmp,0,sizeof(tmp));
-    int pair_cnt=0,tot_cnt=0;
-    for(int i=0;i<5;++i)for(int j=1;j<10;++j){
-        tot_cnt+=tmpMyCard.shouPai[i][j];
-        pair_cnt+=tmpMyCard.shouPai[i][j]/2;
-        tmp[i][j]+=((tmpMyCard.shouPai[i][j]+1)/2)*2;
-        if(outCard.c[i][j]+tmpMyCard.shouPai[i][j]>=4&&(tmpMyCard.shouPai[i][j]&1)) tmp[i][j]=5;
+
+int specialplay;
+int sptmp[6][11];
+bool judgeSpecial(char *tmpCard){
+    if(tmpMyCard.countOutCard>0){
+        specialplay=0;
+        return 0;
     }
+    memset(remCard,0,sizeof(remCard));
+    for(int i=0;i<5;++i) for(int j=1;j<=9;++j)
+        remCard[i][j]=4-outCard.c[i][j]-tmpMyCard.shouPai[i][j];
+    // //七对
+    // memset(tmp,0,sizeof(tmp));
+    // int pair_cnt=0,tot_cnt=0;
+    // for(int i=0;i<5;++i)for(int j=1;j<10;++j){
+    //     tot_cnt+=tmpMyCard.shouPai[i][j];
+    //     pair_cnt+=tmpMyCard.shouPai[i][j]/2;
+    //     tmp[i][j]+=((tmpMyCard.shouPai[i][j]+1)/2)*2;
+    //     if(outCard.c[i][j]+tmpMyCard.shouPai[i][j]>=4&&(tmpMyCard.shouPai[i][j]&1)) tmp[i][j]=5;
+    // }
     //十三幺
-    memset(tmp,0,sizeof(tmp));
-    int dist=1;pair_cnt=0;
+    memset(sptmp,0,sizeof(sptmp));
+    memset(useful,0,sizeof(useful));
+    int dist=0,pair_cnt=0;
     for(int i=0;i<3;++i){
-        tmp[i][1]=tmp[i][9]=tmp[4][i]=2;
-        if(!tmpMyCard.shouPai[i][1]) dist++;
-        if(!tmpMyCard.shouPai[i][9]) dist++;
-        if(!tmpMyCard.shouPai[4][i]) dist++;
-        if(tmpMyCard.shouPai[i][1]==2) pair_cnt=1;
-        if(tmpMyCard.shouPai[i][9]==2) pair_cnt=1;
-        if(tmpMyCard.shouPai[4][i]==2) pair_cnt=1;
+        sptmp[i][1]=sptmp[i][9]=sptmp[4][i]=2;
+        if(!tmpMyCard.shouPai[i][1]){
+            dist++;
+            if(!remCard[i][1]) dist=100;
+        }else useful[i][1]=10;
+        if(!tmpMyCard.shouPai[i][9]){
+            dist++;
+            if(!remCard[i][9]) dist=100;
+        }else useful[i][9]=10;
+        if(!tmpMyCard.shouPai[4][i]){
+            dist++;
+            if(!remCard[4][i]) dist=100;
+        }else useful[4][i]=10;
+        if(tmpMyCard.shouPai[i][1]==2) pair_cnt=1,useful[i][1]=4+remCard[i][1];
+        if(tmpMyCard.shouPai[i][9]==2) pair_cnt=1,useful[i][9]=4+remCard[i][9];
+        if(tmpMyCard.shouPai[4][i]==2) pair_cnt=1,useful[4][i]=4+remCard[4][i];
     }
     for(int i=0;i<4;++i){
-        tmp[3][i]=2;
-        if(!tmpMyCard.shouPai[3][i]) dist++;
-        if(tmpMyCard.shouPai[3][i]==2) pair_cnt=1;
+        sptmp[3][i]=2;
+        if(!tmpMyCard.shouPai[3][i]){
+            dist++;
+            if(!remCard[3][i]) dist=100;
+        }else useful[3][i]=10;
+        if(tmpMyCard.shouPai[3][i]==2) pair_cnt=1,useful[3][i]=4+remCard[3][i];
     }
-    swap(tmpMyCard.shouPai,tmp);
-    updateUseful(dist-pair_cnt);
-    swap(tmpMyCard.shouPai,tmp);
-    //不想写了qaq，其他也不好凑啊www
+    if(!pair_cnt) dist++;
 
-    memset(tmp,0,sizeof(tmp));
-}*/
+    int arr[3]={0,1,2},tdis,tarr[3]={0,1,2};//下面用的 goto不让写下面qwq
+
+    if(dist<4) goto play;
+
+    //全不靠
+    dist=14;
+    memset(useful,0,sizeof(useful));
+    for(int i=0;i<4;++i){//东南西北
+        if(tmpMyCard.shouPai[3][i]){
+            dist--;
+            if(tmpMyCard.shouPai[3][i]==1) useful[3][i]=10;
+        }else if(!remCard[3][i]) dist=100;
+    }
+    for(int i=0;i<3;++i){//中发白
+        if(tmpMyCard.shouPai[4][i]){
+            dist--;
+            if(tmpMyCard.shouPai[4][i]==1) useful[4][i]=10;
+        }else if(!remCard[4][i]) dist=100;
+    }
+    tdis=dist;//goto 不让在这声明w
+    while(next_permutation(arr,arr+3)){//枚举组合方式
+        int ttdis=dist;
+        for(int i=0;i<3;++i){
+            for(int j=1;j<8;j+=3){
+                if(tmpMyCard.shouPai[arr[i]][j+i]){
+                    ttdis--;
+                }
+            }
+        }
+        if(ttdis<tdis){//记录最优组合方式
+            tdis=ttdis;
+            for(int i=0;i<3;++i) tarr[i]=arr[i];
+        }
+    }
+    dist=tdis;
+    for(int i=0;i<3;++i) arr[i]=tarr[i];
+    for(int i=0;i<3;++i){
+        for(int j=1;j<8;j+=3){
+            if(tmpMyCard.shouPai[arr[i]][j+i]==1)
+                useful[arr[i]][j+i]=10;
+        }
+    }
+    if(dist<4) goto play;
+
+    specialplay=0;
+    memset(useful,0,sizeof(useful));
+    return 0;
+
+play:
+    int ii=0,jj=0;
+    for(int i=4;i>=0;--i)for(int j=1;j<10;++j){
+        if(tmpMyCard.shouPai[i][j]>0&&ii==0&&jj==0){
+            ii=i,jj=j;
+        }
+        else if(tmpMyCard.shouPai[i][j]>0&&useful[ii][jj]>useful[i][j]) ii=i,jj=j;
+    }
+    if(!ii&&!jj){//万一出bug了，抓啥打啥？qaq
+        response.push_back("PLAY "+string(tmpCard));
+    }
+    else response.push_back("PLAY "+intToString(ii,jj));
+    memset(useful,0,sizeof(useful));
+    specialplay=1;
+    return 1;
+}
+
 bool haiDi(){
     for(int i=0;i<4;++i) if(!card_cnt[i]) return true;
     return false;
 }
 int judgeChi(const char *tmpCard){
     if(haiDi()) return false;
+    if(specialplay) return false;
     int i=getType(tmpCard),j=tmpCard[1]-'0';
     if(i>2){
         return 0;
@@ -452,6 +534,7 @@ int judgeChi(const char *tmpCard){
 }
 int judgePeng(const char *tmpCard){
     if(haiDi()) return false;
+    if(specialplay) return false;
     int i=getType(tmpCard),j=tmpCard[1]-'0';
     if(Card[myID].shouPai[i][j]<2){
         return 0;
@@ -824,6 +907,12 @@ void play(char *tmpCard){
     tmpMyCard.copy(Card[myID]);
     tmpMyCard.getShouPai();
 
+    if(judgeSpecial(tmpCard)){
+        // specialPlay();
+        //直接写了
+        return;
+    }
+
     if(!rebuild){
         easyplay(tmpCard);
         return;
@@ -1009,7 +1098,7 @@ void getData(){
        >>outCard.leastHuCard>>outCard.chanceToHu;
     sin>>outCard.lastCard;
 
-    sin>>searchover>>rebuild;
+    sin>>searchover>>rebuild>>specialplay;
     sin>>huCnt>>tmphucnt;
     for(int p=1;p<=huCnt;++p){//shun ke dui ms mk md ag os ok og
         sin>>plan[p].tt;
@@ -1065,7 +1154,7 @@ void saveData(){
     PUT(outCard.leastHuCard);PUT(outCard.chanceToHu);
     PUT(outCard.lastCard);
 
-    PUT(searchover);PUT(rebuild);
+    PUT(searchover);PUT(rebuild);PUT(specialplay);
     PUT(huCnt);
     PUT(tmphucnt);
     for(int p=1;p<=huCnt;++p){//shun ke dui ms mk md ag os ok og
