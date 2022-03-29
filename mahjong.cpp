@@ -456,7 +456,7 @@ bool judgeSpecial(char *tmpCard){
                 useful[arr[i]][j+i]=10;
         }
     }
-    if(dist<=4) goto play;
+    if(dist<4) goto play;
 
     specialplay=0;
     memset(useful,0,sizeof(useful));
