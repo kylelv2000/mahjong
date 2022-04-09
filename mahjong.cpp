@@ -342,7 +342,9 @@ void updateUseful(){
     for(int i=0;i<5;++i)for(int j=1;j<10;++j){
         if(!tmpMyCard.shouPai[i][j]) continue;
         --tmpMyCard.shouPai[i][j];
+        ++outCard.c[i][j];
         useful[i][j]=-assessHu();
+        --outCard.c[i][j];
         if(Card[myID].leastHuCard>2){
             if((i>2&&tmpMyCard.shouPai[i][j]<1)||(i<=2&&(tmpMyCard.shouPai[i][j]<1)&&(!tmpMyCard.shouPai[i][j-1]&&!tmpMyCard.shouPai[i][j+1])&&((j>2&&!tmpMyCard.shouPai[i][j-2])||j<=2)&&(j>=8||(j<8&&!tmpMyCard.shouPai[i][j+2])))) useful[i][j]*=2;
             if((i<=2&&tmpMyCard.shouPai[i][j-1]&&tmpMyCard.shouPai[i][j+1])||tmpMyCard.shouPai[i][j]>1) useful[i][j]/=2;
@@ -494,13 +496,15 @@ int judgeChi(const char *tmpCard){
     tmpMyCard.getShouPai();
 
     CARD ret;ret.copy(tmpMyCard);
-    db ta=assessHu(),tb=0,ttb;
+    db ta=assessHu()/2,tb=0,ttb;
     int f=0;
     if(j>=3&&tmpMyCard.shouPai[i][j-2]>0&&tmpMyCard.shouPai[i][j-1]>0){
         char tttmp[4];strcpy(tttmp,intToString(i,j-1).c_str());
         tmpMyCard.addShun(tttmp);
         tmpMyCard.shouPai[i][j-2]--;tmpMyCard.shouPai[i][j-1]--;
+        ++outCard.c[i][j-2];++outCard.c[i][j-1];
         ttb=assessHu();
+        --outCard.c[i][j-2];--outCard.c[i][j-1];
         if(ttb>ta&&ttb>tb){
             f=1;
             tb=ttb;
@@ -511,7 +515,9 @@ int judgeChi(const char *tmpCard){
         char tttmp[4];strcpy(tttmp,intToString(i,j).c_str());
         tmpMyCard.addShun(tttmp);
         tmpMyCard.shouPai[i][j+1]--;tmpMyCard.shouPai[i][j-1]--;
+        ++outCard.c[i][j+1];++outCard.c[i][j-1];
         ttb=assessHu();
+        --outCard.c[i][j+1];--outCard.c[i][j-1];
         if(ttb>ta&&ttb>tb){
             f=2;
             tb=ttb;
@@ -522,7 +528,9 @@ int judgeChi(const char *tmpCard){
         char tttmp[4];strcpy(tttmp,intToString(i,j+1).c_str());
         tmpMyCard.addShun(tttmp);
         tmpMyCard.shouPai[i][j+2]--;tmpMyCard.shouPai[i][j+1]--;
+        ++outCard.c[i][j+2];++outCard.c[i][j+1];
         ttb=assessHu();
+        --outCard.c[i][j+2];--outCard.c[i][j+1];
         if(ttb>ta&&ttb>tb){
             f=3;
             tb=ttb;
@@ -548,9 +556,11 @@ int judgePeng(const char *tmpCard){
     char tttmp[4];strcpy(tttmp,intToString(i,j).c_str());
     tmpMyCard.addMingKe(tttmp);
     tmpMyCard.shouPai[i][j]-=2;
-    if(assessHu()*1.7>ta){
+    outCard.c[i][j]+=2;
+    if(assessHu()*2>ta){
         f=1;
     }
+    outCard.c[i][j]-=2;
     tmpMyCard.copy(ret);
     return f;
 }
