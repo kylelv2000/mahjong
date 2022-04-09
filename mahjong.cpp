@@ -309,11 +309,11 @@ db getassessHu(int p){
 }
 int mytmp[20],mytmp_cnt;
 db dfs7dui(int dep,int z){
-    if(!dep) return 255*255*255;
+    if(!dep) return 3*255*255*255;
     db ta=0;
     for(int i=z,x,y;i<mytmp_cnt;++i){
         x=mytmp[i]/10;y=mytmp[i]%10;
-        ta+=dfs7dui(dep-1,z+1)*remCard[x][y]*0.7/255;
+        ta+=dfs7dui(dep-1,i+1)*remCard[x][y]*0.85/255;
     }
     return ta;
 }
