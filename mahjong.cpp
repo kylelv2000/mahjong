@@ -115,6 +115,7 @@ public:
         tt=a.tt;
     }
 }plan[50010];
+int planval[50010];//番数加权
 int huCnt,tmphucnt;
 huFa TMP;
 class CARD{
@@ -313,7 +314,7 @@ db dfs7dui(int dep,int z){
     db ta=0;
     for(int i=z,x,y;i<mytmp_cnt;++i){
         x=mytmp[i]/10;y=mytmp[i]%10;
-        ta+=dfs7dui(dep-1,i+1)*remCard[x][y]*0.85/255;
+        ta+=dfs7dui(dep-1,i+1)*remCard[x][y]*0.8/255;
     }
     return ta;
 }
@@ -322,7 +323,13 @@ db assessHu(){
     memset(remCard,0,sizeof(remCard));
     for(int i=0;i<5;++i) for(int j=1;j<=9;++j)
         remCard[i][j]=4-outCard.c[i][j]-tmpMyCard.shouPai[i][j];
-    for(int p=1;p<=huCnt;++p) ans+=getassessHu(p);
+    for(int p=1;p<=huCnt;++p){
+        if(Card[myID].leastHuCard>2)
+            ans+=getassessHu(p);
+        else{
+            ans+=getassessHu(p)*(planval[p]?planval[p]:8)/8;
+        }
+    }
     //七小对
     memset(mytmp,0,sizeof(mytmp));mytmp_cnt=0;
     int pair_cnt=0,tot_cnt=0;
@@ -334,7 +341,7 @@ db assessHu(){
     for(int i=0;i<5;++i)for(int j=1;j<10;++j){
         if(tmpMyCard.shouPai[i][j]&1) mytmp[mytmp_cnt++]=i*10+j;
     }
-    ans+=dfs7dui(7-pair_cnt,0);
+    ans+=dfs7dui(7-pair_cnt,0)*(Card[myID].leastHuCard>2?1:3);
     return ans;
 }
 
@@ -496,7 +503,8 @@ int judgeChi(const char *tmpCard){
     tmpMyCard.getShouPai();
 
     CARD ret;ret.copy(tmpMyCard);
-    db ta=assessHu()/2,tb=0,ttb;
+    db ta=assessHu(),tb=0,ttb;
+    if(Card[myID].leastHuCard>1) ta/=2;
     int f=0;
     if(j>=3&&tmpMyCard.shouPai[i][j-2]>0&&tmpMyCard.shouPai[i][j-1]>0){
         char tttmp[4];strcpy(tttmp,intToString(i,j-1).c_str());
@@ -557,6 +565,7 @@ int judgePeng(const char *tmpCard){
     tmpMyCard.addMingKe(tttmp);
     tmpMyCard.shouPai[i][j]-=2;
     outCard.c[i][j]+=2;
+    if(Card[myID].leastHuCard<=1) ta*=2;
     if(assessHu()*2>ta){
         f=1;
     }
@@ -593,7 +602,7 @@ bool judgeGang(){//直接从自己手牌判断杠，其他不管了，标准usef
     // }
     return false;
 }
-bool judgeHu(const char *tmpCard,bool isGang=0){
+int judgeHu(const char *tmpCard,bool isGang=0){
     //Card[myID].add(tmpCard);
     MahjongInit();
     formatCard();
@@ -618,7 +627,7 @@ bool judgeHu(const char *tmpCard,bool isGang=0){
         isOK=false;
         //cout << error << endl;
     }
-    return isOK;
+    return isOK?fan:0;
 }
 
 void responseOther(const char *tmpCard,bool isGang=0){
@@ -692,7 +701,7 @@ void responseOther(const char *tmpCard,bool isGang=0){
     }
 }
 inline bool judgeHu14(){
-    bool ttt;
+    int ttt=0;
     for(int i=0;i<5;++i)for(int j=1;j<10;++j){
         if(tmpMyCard.shouPai[i][j]>tmp[i][j]){
             char tmpGet[4];
@@ -704,7 +713,7 @@ inline bool judgeHu14(){
                 isMyTurn=0;
                 ttt=judgeHu(tmpGet);
                 isMyTurn=1;
-                ttt|=judgeHu(tmpGet);
+                ttt=max(ttt,judgeHu(tmpGet));
                 isMyTurn=tmt;
             }else if(Card[myID].leastHuCard>=3){
                 bool tmt=isMyTurn;
@@ -715,7 +724,7 @@ inline bool judgeHu14(){
                 isMyTurn=tmt;
             }else ttt=judgeHu(tmpGet);
             ++tmpMyCard.shouPai[i][j];
-            return ttt;
+            if(ttt) return true;
         }
     }
     return false;
@@ -1321,13 +1330,21 @@ void rebuildHuFa(int p){
             if(!ii&&!jj) continue;
             tmpMyCard.shouPai[ii][jj]--;
             char tttmp[4];strcpy(tttmp,intToString(ii,jj).c_str());
-            bool ttt,tmt=isMyTurn;
+            bool tmt=isMyTurn;
             isMyTurn=0;
-            ttt=judgeHu(tttmp);
+            int ttt=judgeHu(tttmp);
+            if(ttt){
+                tqaq[++tpHuCnt]=ret;
+                planval[tpHuCnt]=ttt;
+            }
             isMyTurn=1;
-            ttt|=judgeHu(tttmp);
+            ttt=judgeHu(tttmp);
+            if(ttt){
+                tqaq[++tpHuCnt]=ret;
+                planval[tpHuCnt]=ttt;
+            }
             isMyTurn=tmt;
-            if(ttt) tqaq[++tpHuCnt]=ret;
+            // if(ttt) tqaq[++tpHuCnt]=ret;
             tmpMyCard.shouPai[ii][jj]++;
         }else{
             int ii=0,jj=0;
@@ -1337,8 +1354,10 @@ void rebuildHuFa(int p){
                     ii=i,jj=j;
                     tmpMyCard.shouPai[ii][jj]--;
                     char tttmp[4];strcpy(tttmp,intToString(ii,jj).c_str());
-                    if(judgeHu(tttmp)){
+                    int ttt=judgeHu(tttmp);
+                    if(ttt){
                         tqaq[++tpHuCnt]=ret;
+                        if(lhc<=2) planval[tpHuCnt]=ttt;
                         tmpMyCard.shouPai[ii][jj]++;
                         break;
                     } 
